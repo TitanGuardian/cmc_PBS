@@ -3,7 +3,12 @@
 #include <iomanip>
 #include <cmath>
 
-TPower::TPower(const TOptions &opt): power(opt.get()[0]) {}
+TPower::TPower(const TOptions &opt){
+    if (opt.get().empty()) 
+        power = 0;
+    else  
+        power = opt.get()[0];
+}
 TPower::TPower(double _power) : power(_power) {}
 double TPower::GetDeriv(double x_value) {
     return power*(std::pow(x_value,power-1));

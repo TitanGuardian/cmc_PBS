@@ -3,7 +3,12 @@
 #include <iomanip>
 #include <cmath>
 
-TExp::TExp(const TOptions &opt): alpha(opt.get()[0]) {}
+TExp::TExp(const TOptions &opt) {
+    if (opt.get().empty()) 
+        alpha = 1;
+    else  
+        alpha = opt.get()[0];
+}
 TExp::TExp(double _alpha) : alpha(_alpha) {}
 double TExp::GetDeriv(double x_value) {
     return alpha*(std::exp(alpha*x_value));
