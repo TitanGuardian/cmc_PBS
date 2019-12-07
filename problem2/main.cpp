@@ -4,27 +4,57 @@
 #include "Function.h"
 
 int main() {
-
+    //создание фабрики 
     TFunctionFactory factory;
     auto objects = factory.GetAvailableObjects();
+    
+    // доступные объекты для создания
     for (const auto& obj : objects) {
         std::cout << obj << std::endl;
     }
 
-    TFunctionPtr f,g,h;
-
-    f = factory.CreateObject("const",5);
-    g = factory.CreateObject("exp",12);
-    h = factory.CreateObject("polynomial",{-3,4,1});
+    TFunctionPtr f,g,h,e,k;
+    // в качестве второго параметра можно подавать: ничего,
+    // число (приводимое к double) или список инициализации (приводимых к double) 
+    // если подан список инициализации длиной больше, чем подразумевается типом объекта, то
+    // лишние числа будут проигнорированы
+    f = factory.CreateObject("const",5); // параметр может отсутствовать, тогда будет константа 0
+    g = factory.CreateObject("exp",12); // параметр может отсутствовать, тогда будет e^x , иначе e^(alpha*x)
+    h = factory.CreateObject("polynomial",{-3,4,1}); //параметр может отсутствовать, тогда будет полином 0
+    e = factory.CreateObject("power", 25); // параметр может отсутствовать, тогда будет x^0
+    k = factory.CreateObject("ident"); // параметр может присутсвовать, но он ничего не будет решать 
+    
+    
+    // операции перегружены по умным указателям (в целях экономии нескольких килобайт на диске, но это не точно)
+    // ну.. вторая причина иначе слишком много * 
+    
+    //можно делать такое
     std::cout<< (f*h)->ToString() << std::endl;
+    
+    TFunctionPtr complex;
+    //а можно творить такое
+    std::cout<< (complex  = f*h+g-e/k+f+g+h+e+e)->ToString() << std::endl;
+    
+    //и считать от этого производную в точке
+    std::cout<<(*complex).GetDeriv(5)<<"\n";
 
-    std::cout<<(*f).GetDeriv(5)<<"\n";
-
-
-    std::cout<<h->ToString()<<"  = 0  "<< gradient_descent(h)<<std::endl;
-    std::cout<<h->ToString()<<"  = 0  "<< newton_method(h)<<std::endl;
+    
+    // также в Function.cpp реализованы методы поиска корня уравнения f(x)=0
+    
+    // пришлось привести метод градиентного спуска для поиска точки минимума функции
+    // и думать что это метод градиентного спуска для поиска корня данного уравнения
+    
+    // работает плохо, часто ведет в никуда, ну а если подобрать параметры, то работает терпимо
+    // ну и конечно же, застревает в особых точках
+    
+    // h  =  x^2 +4x -3  
+    std::cout<<h->ToString()<<"  = 0 По методу градиентного спуска "<< gradient_descent(h)<<std::endl;
+    
+    // поэтому скорее всего имелся ввиду метод ньютона (фактически градиентный спуск с соответствующим параметром)
+    std::cout<<h->ToString()<<"  = 0 По методу Ньютона "<< newton_method(h)<<std::endl;
+    
+    //ну и получение значения функции в точке
     std::cout<<h->ToString()<< "  x=1: " << (*h)(1)<<std::endl;
-    std::cout<<h->ToString()<< "  x=1: " << h->GetDeriv(0)<<std::endl;
 
 
 
